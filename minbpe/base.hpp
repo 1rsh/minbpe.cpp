@@ -53,11 +53,26 @@ vector<int> merge(
     return new_tokens;
 }
 
+struct hash_pair {
+    template <class T1, class T2>
+    size_t operator()(const pair<T1, T2>& p) const
+    {
+        // Hash the first element
+        size_t hash1 = hash<T1>{}(p.first);
+        // Hash the second element
+        size_t hash2 = hash<T2>{}(p.second);
+        // Combine the two hash values
+        return hash1
+               ^ (hash2 + 0x9e3779b9 + (hash1 << 6)
+                  + (hash1 >> 2));
+    }
+};
+
 
 class Tokenizer {
     public:
         Tokenizer() {
-            merges = map<pair<int, int>, int>();
+            merges = unordered_map<pair<int, int>, int, hash_pair>();
             pattern = "";
             special_tokens = unordered_map<string, int>();
             vocab = _build_vocab();
@@ -87,7 +102,7 @@ class Tokenizer {
             }
 
             for (const auto& m : merges) {
-                model_out << m.first.first << " " << m.first.second << "\n";
+                model_out << m.first.first << " " << m.first.second << " " << m.second << "\n";
             }
             model_out.close();
 
@@ -114,14 +129,14 @@ class Tokenizer {
 
         void load(const string& model_file) {
             assert(model_file.substr(model_file.find_last_of(".") + 1) == "model");
-            map<pair<int, int>, int> merges;
+            unordered_map<pair<int, int>, int, hash_pair> merges;
             unordered_map<string, int> special_tokens;
-            int idx = 256;
+            int idx = this->vocab.size();
 
             ifstream model_in(model_file);
             if (!model_in.is_open()) {
                 std::cerr << "Error opening file." << std::endl;
-                return;
+                throw runtime_error("Error opening file.");
             }
 
             string version, line;
@@ -141,9 +156,9 @@ class Tokenizer {
 
             while (getline(model_in, line)) {
                 istringstream iss(line);
-                int idx1, idx2;
-                iss >> idx1 >> idx2;
-                merges[make_pair(idx1, idx2)] = idx++;
+                int idx1, idx2, idx3;
+                iss >> idx1 >> idx2 >> idx3;
+                merges[make_pair(idx1, idx2)] = idx3;
             }
             model_in.close();
 
@@ -152,7 +167,7 @@ class Tokenizer {
             this->vocab = _build_vocab();
         }
 
-        map<pair<int, int>, int> merges;
+        unordered_map<pair<int, int>, int, hash_pair> merges;
         string pattern;
         unordered_map<string, int> special_tokens;
         unordered_map<int, string> vocab;
@@ -162,7 +177,17 @@ class Tokenizer {
             for (int idx = 0; idx < 256; ++idx) {
                 vocab[idx] = string(1, static_cast<char>(idx)); // all byte values
             }
+
+            vector<pair<pair<int, int>, int> > merge_vector;
             for (const auto& m : merges) {
+                merge_vector.push_back(make_pair(m.first, m.second));
+            }
+            sort(merge_vector.begin(), merge_vector.end(), 
+                [](const pair<pair<int, int>, int>& a, const pair<pair<int, int>, int>& b) {
+                    return a.second < b.second;
+            });
+
+            for (const auto& m : merge_vector) {
                 vocab[m.second] = vocab[m.first.first] + vocab[m.first.second];
             }
             for (const auto& st : special_tokens) {
