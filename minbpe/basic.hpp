@@ -6,19 +6,21 @@ using namespace std;
 
 class BasicTokenizer: public Tokenizer {
     public:
-        virtual void train(const string& text, int vocab_size, bool verbose = false){
+        virtual void train(const string& text, int vocab_size, bool verbose = false, int save_every = -1, string save_dir = ""){
             assert(vocab_size >= 256);
-            int num_merges = vocab_size - 256;
+            int num_merges = vocab_size - this->vocab.size();
 
             // encoded in utf-8
             vector<uint8_t> text_bytes(text.begin(), text.end());
             vector<int> ids(text_bytes.begin(), text_bytes.end()); 
 
-            map<pair<int, int>, int> merges; // (int, int) -> int
+            unordered_map<pair<int, int>, int, hash_pair> merges; // (int, int) -> int
             unordered_map<int, string> vocab; // int -> bytes
             for (int idx = 0; idx < 256; ++idx) {
                 vocab[idx] = string(1, static_cast<char>(idx)); // initializing the vocabulary with single byte tokens
             }
+
+            int old_vocab_size = this->vocab.size();
 
             for (int i = 0; i < num_merges; ++i) {
                 if(!verbose) print_progress_bar(i, num_merges);
@@ -28,13 +30,20 @@ class BasicTokenizer: public Tokenizer {
                 auto max_pair = stats[0];
                 pair<int, int> pair_to_merge = stats[0].first;
                 
-                int new_token_idx = 256 + i;
+                int new_token_idx = old_vocab_size + i;
 
                 ids = merge(ids, pair_to_merge, new_token_idx);
 
                 // Save the merge
                 merges[pair_to_merge] = new_token_idx;
                 vocab[new_token_idx] = vocab[pair_to_merge.first] + vocab[pair_to_merge.second];
+                
+                // Checkpoint
+                if(save_every != -1 && (i+1)%save_every==0){
+                    this->merges.insert(merges.begin(), merges.end());
+                    this->vocab.insert(vocab.begin(), vocab.end());
+                    save(save_dir);
+                }
 
                 if (verbose) {
                     cout << "merge " << (i + 1) << "/" << num_merges 
@@ -44,9 +53,8 @@ class BasicTokenizer: public Tokenizer {
                         << max_pair.second << " occurrences" << endl << flush;
                 }
             }
-
-            this->merges = merges;
-            this->vocab = vocab;
+            this->merges.insert(merges.begin(), merges.end());
+            this->vocab.insert(vocab.begin(), vocab.end());
         }
 
         virtual vector<int> encode(const string& text) {
