@@ -3,7 +3,7 @@
 int main() {
     BasicTokenizer tokenizer;
 
-    string filename = "../tests/test.hi";
+    string filename = "tests/test.hi";
     ifstream file(filename);
 
     string text((istreambuf_iterator<char>(file)), istreambuf_iterator<char>());
