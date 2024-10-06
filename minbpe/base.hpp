@@ -119,6 +119,11 @@ class Tokenizer {
             int idx = 256;
 
             ifstream model_in(model_file);
+            if (!model_in.is_open()) {
+                std::cerr << "Error opening file." << std::endl;
+                return;
+            }
+
             string version, line;
             getline(model_in, version);
             assert(version == "minbpe v1");
@@ -147,7 +152,6 @@ class Tokenizer {
             this->vocab = _build_vocab();
         }
 
-    protected:
         map<pair<int, int>, int> merges;
         string pattern;
         unordered_map<string, int> special_tokens;
