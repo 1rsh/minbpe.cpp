@@ -3,6 +3,8 @@
 int main() {
     BasicTokenizer tokenizer;
     string text = "aaabdaaabac";
+    
+    // tokenizer.load("../models/hindi/hindi_50256.model");
     tokenizer.train(text, 256 + 3, true); // 256 byte tokens, then do 3 merges
 
     vector<int> encoded = tokenizer.encode(text);
