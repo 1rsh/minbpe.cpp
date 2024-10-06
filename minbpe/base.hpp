@@ -72,7 +72,7 @@ struct hash_pair {
 class Tokenizer {
     public:
         Tokenizer() {
-            merges = unordered_map<pair<int, int>, int, hash_pair>();
+            merges = map<pair<int, int>, int>();
             pattern = "";
             special_tokens = unordered_map<string, int>();
             vocab = _build_vocab();
@@ -101,7 +101,17 @@ class Tokenizer {
                 model_out << st.first << " " << st.second << "\n";
             }
 
+
+            vector<pair<pair<int, int>, int> > merge_vector;
             for (const auto& m : merges) {
+                merge_vector.push_back(make_pair(m.first, m.second));
+            }
+            sort(merge_vector.begin(), merge_vector.end(), 
+                [](const pair<pair<int, int>, int>& a, const pair<pair<int, int>, int>& b) {
+                    return a.second < b.second;
+            });
+
+            for (const auto& m : merge_vector) {
                 model_out << m.first.first << " " << m.first.second << " " << m.second << "\n";
             }
             model_out.close();
@@ -129,7 +139,7 @@ class Tokenizer {
 
         void load(const string& model_file) {
             assert(model_file.substr(model_file.find_last_of(".") + 1) == "model");
-            unordered_map<pair<int, int>, int, hash_pair> merges;
+            map<pair<int, int>, int> merges;
             unordered_map<string, int> special_tokens;
             int idx = this->vocab.size();
 
@@ -167,7 +177,7 @@ class Tokenizer {
             this->vocab = _build_vocab();
         }
 
-        unordered_map<pair<int, int>, int, hash_pair> merges;
+        map<pair<int, int>, int> merges;
         string pattern;
         unordered_map<string, int> special_tokens;
         unordered_map<int, string> vocab;

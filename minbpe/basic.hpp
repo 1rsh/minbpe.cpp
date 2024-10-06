@@ -14,7 +14,7 @@ class BasicTokenizer: public Tokenizer {
             vector<uint8_t> text_bytes(text.begin(), text.end());
             vector<int> ids(text_bytes.begin(), text_bytes.end()); 
 
-            unordered_map<pair<int, int>, int, hash_pair> merges; // (int, int) -> int
+            map<pair<int, int>, int> merges; // (int, int) -> int
             unordered_map<int, string> vocab; // int -> bytes
             for (int idx = 0; idx < 256; ++idx) {
                 vocab[idx] = string(1, static_cast<char>(idx)); // initializing the vocabulary with single byte tokens

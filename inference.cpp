@@ -3,9 +3,12 @@
 int main() {
     BasicTokenizer tokenizer;
     string text = "मेरा नाम इर्श है।";
-    
-    tokenizer.load("models/hindi/hindi_50256.model");
 
+    cout << "Original String: " << text << endl;
+    
+    tokenizer.load("models/hindi/hindi_1256.model");
+
+    cout << "Tokens: ";
     vector<int> encoded = tokenizer.encode(text);
     for (int id : encoded) {
         cout << id << " "; // Print encoded ids
@@ -13,7 +16,9 @@ int main() {
     cout << endl;
 
     string decoded = tokenizer.decode(encoded);
-    cout << decoded << endl; // Print the decoded text
+    cout << "Decoded String: " << decoded << endl; // Print the decoded text
+
+    cout << "Check: " << (strcmp(text.c_str(), decoded.c_str()) == 0) << endl;
 
     return 0;
 }
