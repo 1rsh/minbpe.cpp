@@ -5,15 +5,17 @@ int main() {
 
     string filename = "tests/test.hi";
     ifstream file(filename);
-
     string text((istreambuf_iterator<char>(file)), istreambuf_iterator<char>());
     file.close();
 
-    int vocab_size = 1256;
+    // target vocab_size
+    int vocab_size = 50256;
 
-    tokenizer.train(text, vocab_size, false);
+    // train
+    // training text, vocabulary size, verbose, save_every, save_path
+    tokenizer.train(text, vocab_size, false, 100, "models/hindi/hindi_50256");
 
-    tokenizer.save("models/hindi/hindi_1256");
+    tokenizer.save("models/hindi/hindi_50256");
     cout << "Tokenizer trained and saved successfully." << endl;
 
     return 0;
