@@ -1,7 +1,8 @@
 #include "minbpe/basic.hpp"
+#include "minbpe/regex.hpp"
 
 int main() {
-    BasicTokenizer tokenizer;
+    RegexTokenizer tokenizer;
     string text = "मेरा नाम इर्श है।";
 
     cout << "Original String: " << text << endl;
@@ -15,8 +16,14 @@ int main() {
     }
     cout << endl;
 
+    cout << "Decoded String:\n";
+    for (int id : encoded) {
+        cout << tokenizer.vocab[id] << " | "; // Print encoded ids
+    }
+    cout << endl;
+
     string decoded = tokenizer.decode(encoded);
-    cout << "Decoded String: " << decoded << endl; // Print the decoded text
+    cout << decoded << endl; // Print the decoded text
 
     cout << "Check: " << (strcmp(text.c_str(), decoded.c_str()) == 0) << endl;
 

@@ -1,4 +1,5 @@
 #include "../minbpe/basic.hpp"
+#include "../minbpe/regex.hpp"
 
 int main() {
     BasicTokenizer tokenizer;
