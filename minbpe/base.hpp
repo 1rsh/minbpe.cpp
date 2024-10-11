@@ -1,3 +1,6 @@
+#ifndef BASE_HPP   // Start of include guard
+#define BASE_HPP
+
 #include <bits/stdc++.h>
 #include <string>
 using namespace std;
@@ -101,17 +104,7 @@ class Tokenizer {
                 model_out << st.first << " " << st.second << "\n";
             }
 
-
-            vector<pair<pair<int, int>, int> > merge_vector;
             for (const auto& m : merges) {
-                merge_vector.push_back(make_pair(m.first, m.second));
-            }
-            sort(merge_vector.begin(), merge_vector.end(), 
-                [](const pair<pair<int, int>, int>& a, const pair<pair<int, int>, int>& b) {
-                    return a.second < b.second;
-            });
-
-            for (const auto& m : merge_vector) {
                 model_out << m.first.first << " " << m.first.second << " " << m.second << "\n";
             }
             model_out.close();
@@ -220,3 +213,4 @@ class Tokenizer {
             return result;
         }
 };
+#endif

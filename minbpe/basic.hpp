@@ -1,7 +1,5 @@
-#include <bits/stdc++.h>
 #include "base.hpp"
 #include "progressbar.hpp"
-
 using namespace std;
 
 class BasicTokenizer: public Tokenizer {
@@ -21,9 +19,10 @@ class BasicTokenizer: public Tokenizer {
             }
 
             int old_vocab_size = this->vocab.size();
-
+            
+            auto start_time = steady_clock::now();
             for (int i = 0; i < num_merges; ++i) {
-                if(!verbose) print_progress_bar(i, num_merges);
+                if(!verbose) print_progress_bar(i, num_merges, start_time);
 
                 auto stats = sort_stats(get_stats(ids));
 
