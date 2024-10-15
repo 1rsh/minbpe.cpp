@@ -3,10 +3,11 @@
 using namespace std;
 
 regex GPT2_PATTERN(R"('(?:[sdmt]|ll|ve|re)| ?[a-zA-Z]+| ?[0-9]+| ?[^\s\w]+|\s+(?!\S)|\s+)");
+regex GPT4_PATTERN(R"('(?:[sdmt]|ll|ve|re)|[^\r\n\w]?[a-zA-Z]+|\d{1,3}| ?[^\s\w]+[\r\n]*|\s*[\r\n]|\s+(?!\S)|\s+)");
 
 class RegexTokenizer: public Tokenizer {
     public:
-        virtual void train(const string& text, int vocab_size, bool verbose = false, int save_every = -1, string save_dir = "", regex pattern = GPT2_PATTERN){
+        virtual void train(const string& text, int vocab_size, bool verbose = false, int save_every = -1, string save_dir = "", regex pattern = GPT4_PATTERN){
             assert(vocab_size >= 256);
             int num_merges = vocab_size - this->vocab.size();
             vector<string> text_chunks = split_string(text, pattern);
