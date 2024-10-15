@@ -42,8 +42,7 @@ int main() {
 According to Wikipedia, running bpe on the input string: "aaabdaaabac" for 3 merges results in the string: "XdXac" where  X=ZY, Y=ab, and Z=aa. The tricky thing to note is that minbpe always allocates the 256 individual bytes as tokens, and then merges bytes as needed from there. So for us a=97, b=98, c=99, d=100 (their [ASCII](https://www.asciitable.com) values). Then when (a,a) is merged to Z, Z will become 256. Likewise Y will become 257 and X 258. So we start with the 256 bytes, and do 3 merges to get to the result above, with the expected output of [258, 100, 258, 97, 99].
 
 ## todos
-- write RegexTokenizer in C++
-- write GPT4Tokenizer in C++ 
+- optimize it to process large files faster.
 - write LlamaTokenizer in C++?
 
 ## License
